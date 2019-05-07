@@ -7,10 +7,11 @@
     and OSS), Macintosh OS X (CoreAudio and Jack), and Windows
     (DirectSound, ASIO and WASAPI) operating systems.
 
+    RtAudio GitHub site: https://github.com/thestk/rtaudio
     RtAudio WWW site: http://www.music.mcgill.ca/~gary/rtaudio/
 
     RtAudio: realtime audio i/o C++ classes
-    Copyright (c) 2001-2017 Gary P. Scavone
+    Copyright (c) 2001-2019 Gary P. Scavone
 
     Permission is hereby granted, free of charge, to any person
     obtaining a copy of this software and associated documentation files
@@ -38,7 +39,7 @@
 */
 /************************************************************************/
 
-// RtAudio: Version 5.0.0
+// RtAudio: Version 5.1.0
 
 #include "RtAudio.h"
 #include <iostream>
@@ -1905,7 +1906,10 @@ bool RtApiCore :: callbackEvent( AudioDeviceID deviceId,
  unlock:
   //MUTEX_UNLOCK( &stream_.mutex );
 
-  RtApi::tickStreamTime();
+  // Make sure to only tick duplex stream time once if using two devices
+  if ( stream_.mode != DUPLEX || (stream_.mode == DUPLEX && handle->id[0] != handle->id[1] && deviceId == handle->id[0] ) )
+    RtApi::tickStreamTime();
+  
   return SUCCESS;
 }
 
