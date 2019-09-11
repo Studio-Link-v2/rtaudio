@@ -885,6 +885,16 @@ RtAudio::DeviceInfo RtApiCore :: getDeviceInfo( unsigned int device )
   if ( info.inputChannels > 0 )
     if ( getDefaultInputDevice() == device ) info.isDefaultInput = true;
 
+
+  Float64 nominalRate;
+  dataSize = sizeof( Float64 );
+  property.mSelector = kAudioDevicePropertyNominalSampleRate;
+  if ( isInput == false ) property.mScope = kAudioDevicePropertyScopeOutput;
+  result = AudioObjectGetPropertyData( id, &property, 0, NULL, &dataSize, &nominalRate );
+  if ( result == noErr ) {
+    info.preferredSampleRate = (unsigned int) nominalRate;
+  }
+
   info.probed = true;
   return info;
 }
